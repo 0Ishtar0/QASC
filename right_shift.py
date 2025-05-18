@@ -7,7 +7,7 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCXGate
 
 
-def rightshift(n, targets=None, controls=None, controlStates=None):
+def rightshift(n, targets=None, controls=None, control_states=None):
     """
     Constructs an n-qubit quantum circuit that performs a right-shift
     on the specified target qubits, optionally controlled by control qubits.
@@ -16,7 +16,7 @@ def rightshift(n, targets=None, controls=None, controlStates=None):
         n (int): total number of qubits
         targets (list): indices of target qubits to shift (default: 0 to n-1)
         controls (list): indices of control qubits (default: empty list)
-        controlStates (list): acceptable control states (default: all 1s)
+        control_states (list): acceptable control states (default: all 1s)
 
     Returns:
         QuantumCircuit: the constructed right shift circuit
@@ -26,15 +26,15 @@ def rightshift(n, targets=None, controls=None, controlStates=None):
         targets = list(range(n))
     if controls is None:
         controls = []
-    if controlStates is None:
-        controlStates = [1] * len(controls)
+    if control_states is None:
+        control_states = [1] * len(controls)
 
     # --- Input validation ---
     assert n > 0
     assert all(0 <= t < n for t in targets), "Invalid target qubit index"
     assert all(0 <= c < n for c in controls), "Invalid control qubit index"
     assert set(targets).isdisjoint(set(controls)), "Targets and controls must be disjoint"
-    assert len(controls) == len(controlStates), "Mismatch in controls and controlStates lengths"
+    assert len(controls) == len(control_states), "Mismatch in controls and controlStates lengths"
 
     # --- Build Circuit ---
     qc = QuantumCircuit(n)
@@ -42,7 +42,7 @@ def rightshift(n, targets=None, controls=None, controlStates=None):
     for i in range(1, len(targets)):
         # current control qubits and state
         ctrl = controls + targets[i:]
-        ctrlStates = controlStates + [0] * (len(targets) - i)
+        ctrlStates = control_states + [0] * (len(targets) - i)
         ctrl_state_str = ''.join(str(b) for b in ctrlStates)
         target = targets[i - 1]
 
@@ -63,7 +63,7 @@ def rightshift(n, targets=None, controls=None, controlStates=None):
     if len(controls) == 0:
         qc.x(targets[-1])
     else:
-        ctrl_state_str = ''.join(str(b) for b in controlStates)
+        ctrl_state_str = ''.join(str(b) for b in control_states)
         final_gate = MCXGate(len(controls), ctrl_state=ctrl_state_str)
         qc.append(final_gate, controls + [targets[-1]])
 
