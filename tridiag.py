@@ -43,8 +43,8 @@ def tridiag(n, alpha, beta, gamma):
 
     # -------------------- Diffusion Circuit D --------------------
     D = QuantumCircuit(total_qubits, name="D")
-    D.h(1)
-    D.h(2)
+    D.h(n + 1)
+    D.h(n)
 
     # -------------------- OA Circuit --------------------
     OA = QuantumCircuit(total_qubits, name="OA")
@@ -54,23 +54,27 @@ def tridiag(n, alpha, beta, gamma):
     theta2 = 2 * np.arccos(gamma)
 
     # 模拟 MCRotationY(control_qubits, target, control_state, angle)
-    OA.append(multi_controlled_ry(theta0, [1, 2], 0, [0, 0]), [0, 1, 2])
-    OA.append(multi_controlled_ry(theta1, [1, 2], 0, [0, 1]), [0, 1, 2])
-    OA.append(multi_controlled_ry(theta2, [1, 2], 0, [1, 0]), [0, 1, 2])
+    OA.append(multi_controlled_ry(theta0, [1, 2], 0, [0, 0]), [n + 2, n + 1, n])
+    OA.append(multi_controlled_ry(theta1, [1, 2], 0, [0, 1]), [n + 2, n + 1, n])
+    OA.append(multi_controlled_ry(theta2, [1, 2], 0, [1, 0]), [n + 2, n + 1, n])
 
     # 多控制 RY，控制条件是 [0, 1,...,n+1]
     ctrl_condition1 = [0] + [1] * (n + 1)  # [0, 1, 1, ..., 1]
     ctrl_condition2 = [1] + [0] * (n + 1)  # [1, 0, 0, ..., 0]
     ctrl_qubits_full = list(range(1, n + 3))
 
-    OA.append(multi_controlled_ry(np.pi - theta1, ctrl_qubits_full, 0, ctrl_condition1), list(range(total_qubits)))
-    OA.append(multi_controlled_ry(np.pi - theta2, ctrl_qubits_full, 0, ctrl_condition2), list(range(total_qubits)))
+    lst = list(range(total_qubits))
+    lst.reverse()
+    OA.append(multi_controlled_ry(np.pi - theta1, ctrl_qubits_full, 0, ctrl_condition1),
+              lst)
+    OA.append(multi_controlled_ry(np.pi - theta2, ctrl_qubits_full, 0, ctrl_condition2),
+              lst)
 
     # -------------------- OC Circuit --------------------
     OC = QuantumCircuit(n + 2, name="OC")
 
-    OC.append(leftshift(n + 2, list(range(2, n + 1)), controls=[1]).to_gate(label='L'), list(range(n + 2)))
-    OC.append(rightshift(n + 2, list(range(2, n + 1)), controls=[0]).to_gate(label='R'), list(range(n + 2)))
+    OC.append(leftshift(n + 2, list(range(n)), controls=[n]).to_gate(label='L'), list(range(n + 2)))
+    OC.append(rightshift(n + 2, list(range(n)), controls=[n + 1]).to_gate(label='R'), list(range(n + 2)))
 
     # -------------------- Total Circuit --------------------
     circuit = QuantumCircuit(total_qubits, name="MainCircuit")
@@ -96,3 +100,7 @@ if __name__ == "__main__":
     U = result.get_unitary(circuit)
     np.set_printoptions(threshold=np.inf)
     print(4 * U)
+    indices = [i << 3 for i in range(8)]
+
+    A_sub = U[np.ix_(indices, indices)]
+    print(A_sub)

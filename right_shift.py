@@ -1,10 +1,12 @@
+import numpy as np
 from matplotlib import pyplot as plt
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile
 from qiskit.circuit.library import MCXGate
 from typing import List
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCXGate
+from qiskit_aer import Aer
 
 
 def rightshift(n, targets=None, controls=None, control_states=None):
@@ -42,7 +44,7 @@ def rightshift(n, targets=None, controls=None, control_states=None):
     for i in range(1, len(targets)):
         # current control qubits and state
         ctrl = controls + targets[i:]
-        ctrlStates = control_states + [0] * (len(targets) - i)
+        ctrlStates = [0] * (len(targets) - i) + control_states
         ctrl_state_str = ''.join(str(b) for b in ctrlStates)
         target = targets[i - 1]
 
@@ -76,6 +78,13 @@ if __name__ == "__main__":
     controls = []
     control_states = []
 
-    qc = rightshift(n)
-    qc.draw("mpl")
+    qc = rightshift(n, list(range(n - 1)), [n - 1])
+    qc.draw('mpl')
     plt.show()
+    backend = Aer.get_backend('unitary_simulator')
+    transpiled = transpile(qc, backend)
+    job = backend.run(transpiled)
+    result = job.result()
+    U = result.get_unitary(qc)
+    np.set_printoptions(threshold=np.inf)
+    print(U)

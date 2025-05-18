@@ -67,6 +67,6 @@ def leftshift(n: int,
 
 if __name__ == "__main__":
     n = 5
-    qc = leftshift(n)
+    qc = leftshift(n + 2, list(range(2, n + 1)), controls=[1])
     qc.draw("mpl")
     plt.show()
