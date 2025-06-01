@@ -1,0 +1,64 @@
+\documentclass{article}
+
+\usepackage[final]{neurips_2022}
+\usepackage[UTF8]{ctex}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkbordercolor=white,
+}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+
+\title{Explicit Quantum Circuits for Block Encodings of Sparse Matrices: A Review and Exploration}
+
+\author{%
+    \large Zibo Ren \\
+    \large \texttt{2200010626}
+    \And
+    \large Zixuan Yuan \\
+    \large \texttt{2200010825}
+}
+
+
+
+\begin{document}
+
+
+    \maketitle
+
+    \begin{abstract}
+
+        Efficiently constructing quantum circuits for block encodings of matrices is crucial for leveraging quantum linear algebra algorithms, which promise significant speedups for many computational problems.
+        A block encoding is a technique where a matrix of interest is embedded within a larger unitary matrix, making it amenable to quantum computation.
+        The realization of quantum advantage, however, heavily relies on the effective construction of these block encoding circuits, a task that presents considerable challenges, even when dealing with well-structured sparse matrices.
+        This report reviews the work by Camps et al. \cite{EQC} on explicit circuit constructions for block encodings of certain well-structured sparse matrices.
+        We delve into their proposed strategies, analyze their numerical demonstrations and reproduce their experiments.
+        Furthermore, we explore potential avenues for original contributions and future research directions stemming from this work.
+        We also provide implementations of the quantum circuits discussed in this paper in Python.
+
+    \end{abstract}
+
+    \bibliographystyle{unsrt}
+    \bibliography{references}
+\end{document}
