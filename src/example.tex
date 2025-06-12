@@ -1,0 +1,15 @@
+\documentclass[border=2px]{standalone}
+
+\usepackage[braket, qm]{qcircuit}
+\usepackage{graphicx}
+
+\begin{document}
+    \scalebox{1.0}{
+        \Qcircuit @C=1.0em @R=1.0em @!R { \\
+        \nghost{{ctrl} :  } & \lstick{{\ket{0}} :  } & \qw & \multigate{2}{\mathrm{O_A}}_<<<{0} & \qw & \meter & \qw & \qw & \qw & \qw\\
+        \nghost{{data} :  } & \lstick{{\ket{0^m}} :  } & \gate{\mathrm{D_s}} & \ghost{\mathrm{O_A}}_<<<{1} & \multigate{1}{\mathrm{O_C}}_<<<{0} & \qw & \gate{\mathrm{D_s^\dagger}} & \meter & \qw & \qw\\
+        \nghost{{aux} :  } & \lstick{{\ket{j}} :  } & \qw & \ghost{\mathrm{O_A}}_<<<{2} & \ghost{\mathrm{O_C}}_<<<{1} & \qw & \qw & \qw & \qw & \qw\\
+        \nghost{\mathrm{{c0} :  }} & \lstick{\mathrm{c_0 :  }} & \lstick{/_{_{1}}} \cw & \cw & \cw & \dstick{_{_{\hspace{0.0em}0}}} \cw \ar @{<=} [-3,0] & \cw & \cw & \cw & \cw\\
+        \nghost{\mathrm{{c1} :  }} & \lstick{\mathrm{c_1 :  }} & \lstick{/_{_{1}}} \cw & \cw & \cw & \cw & \cw & \dstick{_{_{\hspace{0.0em}0}}} \cw \ar @{<=} [-3,0] & \cw & \cw\\
+        \\ }}
+\end{document}
