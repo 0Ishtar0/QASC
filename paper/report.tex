@@ -20,8 +20,8 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{listings}
-\usepackage{braket}
-
+\usepackage{quantikz}
+\usepackage{caption}
 \hypersetup{
     colorlinks=true,
     linkbordercolor=white,
@@ -44,7 +44,6 @@
 
 \begin{document}
 
-    \large
 
     \maketitle
 
@@ -105,7 +104,121 @@
     Through these tools, researchers can test and validate their algorithms on actual quantum hardware, thereby advancing the practical applications of quantum computing
 
 
+    \section{Preliminary}\label{sec:preliminary}
+    In this section, we introduce the necessary mathematical and quantum computing concepts that underpin the construction of block encodings for sparse matrices.
+    As the basis for quantum algorithms, we use the $\bra{\cdot}$ and $\ket{\cdot}$ notation to denote the complex conjugate and quantum state vector, respectively. In particular, we use the notation $\ket{n}$ to represent the n-th basis in a $2^k$-dimensional Hilbert space, where $k$ is the number of qubits.
 
+    We present the notations for several common quantum gates, for example, the Hadamard gate $H$, the Pauli gates $X$, $Y$, and $Z$, defined as follows:
+    \begin{equation}
+        H = \frac{1}{\sqrt{2}}
+        \begin{bmatrix}
+            1 & 1  \\
+            1 & -1
+        \end{bmatrix}, \qquad
+        X =
+        \begin{bmatrix}
+            0 & 1 \\
+            1 & 0
+        \end{bmatrix}, \qquad
+        Y =
+        \begin{bmatrix}
+            0 & -i \\
+            i & 0
+        \end{bmatrix}, \qquad
+        Z =
+        \begin{bmatrix}
+            1 & 0  \\
+            0 & -1
+        \end{bmatrix}\label{eq:equation}
+    \end{equation}
+    Moreover, rotation matrices about the Pauli-$Y$ axis are crucial components in constructing block encoding circuits and can be expressed as
+    \begin{equation}
+        R_y(\theta) :=
+        \begin{bmatrix}
+            \cos\left(\frac{\theta}{2}\right) & -\sin\left(\frac{\theta}{2}\right) \\
+            \sin\left(\frac{\theta}{2}\right) & \cos\left(\frac{\theta}{2}\right)
+        \end{bmatrix}
+        = e^{-i \frac{\theta}{2} Y}, \tag{2.2} \label{eq:RY}
+    \end{equation}
+    where $\theta$ denotes the rotation angle and the unitary $Y$ is defined in Eq.~\eqref{eq:equation}. The matrices in Eqs.~\eqref{eq:equation} and \eqref{eq:RY} are $2 \times 2$ unitary operators that serve as fundamental single-qubit quantum gates.
+
+    Additionally,a significant category of quantum gates is the controlled gates, where one or more qubits function as control elements for an operation.
+    Graphically, control operations are depicted using a vertical line connecting the control qubit(s) to the target gate, which may be a single gate or a subcircuit block, such as a controlled-NOT (CNOT) gate(Fig.~\ref{fig:controlled-gates}).
+    A filled circle on the control line signifies that the target operation is executed when the control qubit is in state $\ket{1}$ , whereas an unfilled circle indicates execution when the control qubit is in state $\ket{0}$ .
+    \begin{figure}[htbp]
+        \centering
+        \subfigure[$\ket{0}$ controlled]{            \centering\label{fig:0-controlled-gates}
+            \begin{quantikz}
+                \lstick{$q_0$} & \octrl{1} & \qw \\
+                \lstick{$q_1$} & \targ{} & \qw
+            \end{quantikz}
+            \hspace{0.5cm}
+            $=$
+            \hspace{0.5cm}
+            $\begin{bmatrix}
+                 0 & 1 & 0 & 0 \\
+                 1 & 0 & 0 & 0 \\
+                 0 & 0 & 1 & 0 \\
+                 0 & 0 & 0 & 1
+            \end{bmatrix}$
+        }
+        \hspace{1cm}
+        \subfigure[$\ket{1}$ controlled]{            \centering\label{fig:1-controlled-gates}
+        \centering
+            \begin{quantikz}
+                \lstick{$q_0$} & \ctrl{1} & \qw \\
+                \lstick{$q_1$} & \targ{} & \qw
+            \end{quantikz}
+            \hspace{0.5cm}
+            $=$
+            \hspace{0.5cm}
+            $\begin{bmatrix}
+                 1 & 0 & 0 & 0 \\
+                 0 & 1 & 0 & 0 \\
+                 0 & 0 & 0 & 1 \\
+                 0 & 0 & 1 & 0
+            \end{bmatrix}$
+        }
+        \caption{Controlled-NOT gates with $\ket{0}$ and $\ket{1}$ controls and their matrix representations.}\label{fig:controlled-gates}
+    \end{figure}
+
+    Mathematically, the controlled gates depicted in Fig.~\ref{fig:controlled-gates} correspond to the expressions
+    $$
+    E_0 \otimes X + (I - E_0) \otimes I \quad \text{and} \quad E_1 \otimes X + (I - E_1) \otimes I, \tag{2.3}
+    $$
+    where the orthogonal projection operators
+    $$
+    E_0 = e_0 e_0^T = |0\rangle\langle 0|, \qquad E_1 = e_1 e_1^T = |1\rangle\langle 1|. \tag{2.4}
+    $$
+    These operators act as control elements.
+    Specifically, the NOT ($X$) operation is applied to qubit $q_1$ (Fig.~\ref{fig:0-controlled-gates}) only when the input to qubit $q_0$ is $|0\rangle$. Analogously, the NOT operation is triggered for qubit $q_1$ (Fig.~\ref{fig:1-controlled-gates}) if the input to $q_0$ is $|1\rangle$.
+    This formulation can be extended to describe multi-qubit controlled-NOT gates.
+
+    Throughout this paper, we use the python library \texttt{qiskit} \cite{wille2019ibm} to implement and draw quantum circuits for bolck-encoding sparse matrices.
+    This library provides tools to compute the unitary representation of a quantum circuit, which is essential for analyzing the circuit's theoretical significance.
+    For example, the quantum circuit in Fig.~\ref{fig:circuit1} can be implemented in \texttt{qiskit} as follows:
+    \begin{lstlisting}[language=Python, label={lst:ghz-circuit}]
+    qc = QuantumCircuit(3, 3)
+    qc.h(0)
+    qc.cx(0, 1)
+    qc.cx(0, 2)
+    qc.measure([0, 1, 2], [0, 1, 2])
+    \end{lstlisting}
+    This circuit represents a three-qubit GHZ state, which is a fundamental quantum state used in various quantum algorithms and protocols.
+    To generate a GHZ state, we apply a Hadamard gate on the first qubit to create superposition, followed by two CNOT gates to entangle it with the second and third qubits.
+    This gate can be represented as $\ket{GHZ} = (\ket{000}+\ket{111})/\sqrt{2}$.
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[h]{pdf/example}
+        \caption{
+            GHZ State
+        }
+        \label{fig:circuit1}
+    \end{figure}
+
+
+    \section{Efficient Block Encoding of s-Sparse Matrices}
 
 
 

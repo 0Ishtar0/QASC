@@ -75,9 +75,7 @@
 \usepackage[verbose=true,letterpaper]{geometry}
 \AtBeginDocument{
   \newgeometry{
-    textheight=9in,
-    textwidth=5.5in,
-    top=1in,
+    margin=2.5cm, % Changed textheight, textwidth, top to a uniform margin
     headheight=12pt,
     headsep=25pt,
     footskip=30pt
@@ -95,7 +93,7 @@
 
 % font sizes with reduced leading
 \renewcommand{\normalsize}{%
-  \@setfontsize\normalsize\@xpt\@xipt
+  \@setfontsize\normalsize\@xipt{13.14pt}% Fontsize 11pt (10.95pt), linespacing 1.2 * 10.95pt = 13.14pt
   \abovedisplayskip      7\p@ \@plus 2\p@ \@minus 5\p@
   \abovedisplayshortskip \z@ \@plus 3\p@
   \belowdisplayskip      \abovedisplayskip
@@ -103,20 +101,20 @@
 }
 \normalsize
 \renewcommand{\small}{%
-  \@setfontsize\small\@ixpt\@xpt
+  \@setfontsize\small\@xpt{12pt}% Fontsize 10pt, linespacing 1.2 * 10pt = 12pt
   \abovedisplayskip      6\p@ \@plus 1.5\p@ \@minus 4\p@
   \abovedisplayshortskip \z@  \@plus 2\p@
   \belowdisplayskip      \abovedisplayskip
   \belowdisplayshortskip 3\p@ \@plus 2\p@   \@minus 2\p@
 }
-\renewcommand{\footnotesize}{\@setfontsize\footnotesize\@ixpt\@xpt}
-\renewcommand{\scriptsize}{\@setfontsize\scriptsize\@viipt\@viiipt}
-\renewcommand{\tiny}{\@setfontsize\tiny\@vipt\@viipt}
-\renewcommand{\large}{\@setfontsize\large\@xiipt{14}}
-\renewcommand{\Large}{\@setfontsize\Large\@xivpt{16}}
-\renewcommand{\LARGE}{\@setfontsize\LARGE\@xviipt{20}}
-\renewcommand{\huge}{\@setfontsize\huge\@xxpt{23}}
-\renewcommand{\Huge}{\@setfontsize\Huge\@xxvpt{28}}
+\renewcommand{\footnotesize}{\@setfontsize\footnotesize\@ixpt{10.8pt}}% Fontsize 9pt, linespacing 1.2 * 9pt = 10.8pt
+\renewcommand{\scriptsize}{\@setfontsize\scriptsize\@viiipt{9.6pt}}% Fontsize 8pt, linespacing 1.2 * 8pt = 9.6pt (changed from \@viipt)
+\renewcommand{\tiny}{\@setfontsize\tiny\@vipt{7.2pt}}% Fontsize 6pt, linespacing 1.2 * 6pt = 7.2pt
+\renewcommand{\large}{\@setfontsize\large\@xiipt{14.4pt}}% Fontsize 12pt, linespacing 1.2 * 12pt = 14.4pt
+\renewcommand{\Large}{\@setfontsize\Large\@xivpt{17.28pt}}% Fontsize 14.4pt, linespacing 1.2 * 14.4pt = 17.28pt
+\renewcommand{\LARGE}{\@setfontsize\LARGE\@xviipt{20.736pt}}% Fontsize 17.28pt, linespacing 1.2 * 17.28pt = 20.736pt
+\renewcommand{\huge}{\@setfontsize\huge\@xxpt{24.888pt}}% Fontsize 20.74pt, linespacing 1.2 * 20.74pt = 24.888pt
+\renewcommand{\Huge}{\@setfontsize\Huge\@xxvpt{29.856pt}}% Fontsize 24.88pt, linespacing 1.2 * 24.88pt = 29.856pt
 
 % sections with less space
 \providecommand{\section}{}

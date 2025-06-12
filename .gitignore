@@ -245,7 +245,7 @@ cython_debug/
 # LaTeX
 *.aux
 *.out
-*.pdf
 *.bbl
 *.blg
 *.synctex.gz
+report.pdf
