@@ -1,0 +1,15 @@
+\documentclass[border=2px]{standalone}
+
+\usepackage[braket, qm]{qcircuit}
+\usepackage{graphicx}
+
+\begin{document}
+\scalebox{1.0}{
+\Qcircuit @C=1.0em @R=0.2em @!R { \\
+         \nghost{{q}_{0} :  } & \lstick{\ket{0}  :  } & \gate{\mathrm{R_y}(\phi_0)} & \targ & \gate{\mathrm{R_y}(\phi_1)} & \targ & \gate{\mathrm{R_y}(\phi_2)} & \targ & \gate{\mathrm{R_y}(\phi_3)} & \targ & \qw & \qw & \qw & \meter\\
+         \nghost{{q}_{1} :  } & \lstick{\ket{0} :  } & \gate{\mathrm{H}} & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \ctrl{-1} & \qw & \ctrl{2} & \gate{\mathrm{H}} & \qw & \meter \\
+         \nghost{{q}_{2} :  } & \lstick{\ket{0} :  } & \gate{\mathrm{H}} & \ctrl{-2} & \qw & \qw & \qw & \ctrl{-2} & \qw & \ctrl{1} & \qw & \qw & \gate{\mathrm{H}} & \qw & \qw&  \meter &\\
+         \nghost{{q}_{3} :  } & \lstick{\ket{j} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \gate{\mathrm{L}} & \qw & \gate{\mathrm{R}}  & \qw & \qw& \qw& \qw& \qw \\
+		 \nghost{\mathrm{{c} :  }} & \lstick{\mathrm{{c} :  }} & \lstick{/_{_{3}}} \cw &\cw &\cw &\cw &\cw &\cw &\cw &\cw &\cw &\cw &\cw & \dstick{_{_{\hspace{0.0em}0}}} \cw \ar @{<=} [-4,0] & \dstick{_{_{\hspace{0.0em}1}}} \cw \ar @{<=} [-3,0] & \dstick{_{_{\hspace{0.0em}2}}} \cw \ar @{<=} [-2,0] & \cw \\
+\\ }}
+\end{document}
