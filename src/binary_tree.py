@@ -47,7 +47,7 @@ qc.append(controlled_R, [q[1], q[2], q[3], q[5], q[6], q[7]])
 sub_d_2 = QuantumCircuit(4, name='D\\_2')
 D_2 = sub_d_2.to_gate()
 c_D_2 = D_2.control(2, ctrl_state='01')
-qc.append(c_M_2, [q[1], q[2], q[4], q[5], q[6], q[7]])
+qc.append(c_D_2, [q[1], q[2], q[4], q[5], q[6], q[7]])
 
 qc.h(q[1])
 qc.h(q[2])

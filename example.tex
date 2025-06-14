@@ -5,11 +5,11 @@
 
 \begin{document}
 \scalebox{1.0}{
-\Qcircuit @C=1.0em @R=0.2em @!R { \\
-         \nghost{{q}_{0} :  } & \lstick{\ket{0}  :  } & \gate{\mathrm{R_y}(\phi_0)} & \targ & \gate{\mathrm{R_y}(\phi_1)} & \targ & \gate{\mathrm{R_y}(\phi_2)} & \targ & \gate{\mathrm{R_y}(\phi_3)} & \targ & \qw & \qw & \qw & \meter\\
-         \nghost{{q}_{1} :  } & \lstick{\ket{0} :  } & \gate{\mathrm{H}} & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \ctrl{-1} & \qw & \ctrl{2} & \gate{\mathrm{H}} & \qw & \meter \\
-         \nghost{{q}_{2} :  } & \lstick{\ket{0} :  } & \gate{\mathrm{H}} & \ctrl{-2} & \qw & \qw & \qw & \ctrl{-2} & \qw & \ctrl{1} & \qw & \qw & \gate{\mathrm{H}} & \qw & \qw&  \meter &\\
-         \nghost{{q}_{3} :  } & \lstick{\ket{j} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \gate{\mathrm{L}} & \qw & \gate{\mathrm{R}}  & \qw & \qw& \qw& \qw& \qw \\
-		 \nghost{\mathrm{{c} :  }} & \lstick{\mathrm{{c} :  }} & \lstick{/_{_{3}}} \cw &\cw &\cw &\cw &\cw &\cw &\cw &\cw &\cw &\cw &\cw & \dstick{_{_{\hspace{0.0em}0}}} \cw \ar @{<=} [-4,0] & \dstick{_{_{\hspace{0.0em}1}}} \cw \ar @{<=} [-3,0] & \dstick{_{_{\hspace{0.0em}2}}} \cw \ar @{<=} [-2,0] & \cw \\
+\Qcircuit @C=1.0em @R=1.0em @!R { \\
+	 	\nghost{{q}_{0} :  } & \lstick{\ket{0} :  } & \qw & \qw & \qswap & \qw & \meter & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{1} :  } & \lstick{\ket{0} :  } & \qw & \multigate{2}{\mathrm{O\\_A}}_<<<{0} & \qswap \qwx[-1] & \qw & \qw & \qw & \multigate{2}{\mathrm{O\\_A^\dagger}}_<<<{0} & \qw & \meter & \qw & \qw & \qw\\
+	 	\nghost{{q}_{2} :  } & \lstick{\ket{0^n} :  } & \gate{\mathrm{D\\_s}} & \ghost{\mathrm{O\\_A}}_<<<{1} & \multigate{1}{\mathrm{O\\_C}}_<<<{0} & \multigate{1}{\mathrm{SWAP}}_<<<{0} & \qw & \multigate{1}{\mathrm{O\\_C^\dagger}}_<<<{0} & \ghost{\mathrm{O\\_A^\dagger}}_<<<{1} & \gate{\mathrm{D\\_s^\dagger}} & \qw & \meter & \qw & \qw\\
+	 	\nghost{{q}_{3} :  } & \lstick{\ket{j} :  } & \qw & \ghost{\mathrm{O\\_A}}_<<<{2} & \ghost{\mathrm{O\\_C}}_<<<{1} & \ghost{\mathrm{SWAP}}_<<<{1} & \qw & \ghost{\mathrm{O\\_C^\dagger}}_<<<{1} & \ghost{\mathrm{O\\_A^\dagger}}_<<<{2} & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{\mathrm{{c} :  }} & \lstick{\mathrm{{c} :  }} & \lstick{/_{_{3}}} \cw & \cw & \cw & \cw & \dstick{_{_{\hspace{0.0em}0}}} \cw \ar @{<=} [-4,0] & \cw & \cw & \cw & \dstick{_{_{\hspace{0.0em}1}}} \cw \ar @{<=} [-3,0] & \dstick{_{_{\hspace{0.0em}2}}} \cw \ar @{<=} [-2,0] & \cw & \cw\\
 \\ }}
 \end{document}
