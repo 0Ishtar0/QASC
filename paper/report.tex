@@ -75,7 +75,7 @@ The significance of this work is twofold. First, for scaled $s$-sparse matrices 
 
 This review synthesizes the key contributions of Camps et al. \cite{EQC}, including their general strategy for sparse matrix block encoding, numerical demonstrations using the QCLAB toolbox in MATLAB, and connections to quantum walk algorithms. We provide Python implementations of their circuits for reproducibility. By analyzing both theoretical and practical aspects, this report aims to illuminate pathways for advancing quantum linear algebra algorithms in real-world applications.
 
-All quantum circuits figures in this paper are generated using the Python library \texttt{qiskit}, and are available at \url{https://github.com/0Ishtar0/QASC}.
+All quantum circuits figures in this paper are generated using the Python library \texttt{qiskit}. Our code is available at \url{https://github.com/0Ishtar0/QASC}.
 
 \section{Related Works}
 
@@ -221,7 +221,7 @@ This gate can be represented as $\ket{GHZ} = (\ket{000}+\ket{111})/\sqrt{2}$.
   \label{fig:circuit1}
 \end{figure}
 
-\section{Efficient Block Encoding of s-Sparse Matrices}\label{sec:block_encoding}
+\section{Efficient Block Encoding of Sparse Matrices}\label{sec:block_encoding}
 \begin{definition}[Block encoding]
   \label{def:block_encoding}
   Given an $n$-qubit matrix $A$ ($N = 2^n$), if we can find $\alpha, \epsilon \in \mathbb{R}_+$, and an $(m + n)$-qubit unitary matrix $U_A$ so that
@@ -332,9 +332,9 @@ The original paper developed a quantum circuit with polynomial gate complexity--
 
 In this section, we provide concrete instances showcasing the implementation of efficient $O_C$ and $O_A$ quantum circuits in theorem \ref{thm:main_result} tailored for structured sparse matrices.
 
-\subsection{Block Encoding of real symmetric $2\times2$ matrices}
+\subsection{Block Encoding of Real Symmetric $2 \times 2$ Matrices}
 
-We take a simple matrix
+As a concrete example, consider the real symmetric matrix:
 \begin{equation}
   A =
   \begin{bmatrix}
@@ -342,86 +342,87 @@ We take a simple matrix
     b & a
   \end{bmatrix}.\label{eq:example_matrix}
 \end{equation}
-Though this matrix is dense, it can be viewed as a $2$-sparse matrix with $s=2$.
+Although this matrix is dense, it can be treated as a $2$-sparse matrix with sparsity $s = 2$, since each row has at most two nonzero entries.
 
-It is apparent to find that $c(j,\ell)$ can be defined as follows:
+To construct its block encoding, we begin by defining the function $c(j, \ell)$, which determines the column index for a given row index $j$ and $\ell$-th nonzero entry. In this case, we can define:
 \begin{equation}
-  c(j,\ell) =(j + \ell) \mod 2,\label{eq:equation12}
+  c(j,\ell) = (j + \ell) \mod 2,\label{eq:equation12}
 \end{equation}
-and thus, $O_C$ can be implemented as a CNOT gate.
+which allows us to implement the corresponding oracle $O_C$ using a single CNOT gate.
 
-For the second oracle $O_A$, notice that $a$ and $b$ in \ref{eq:example_matrix} depend on $\ell$, and thus can give a circuit that only requires $\ket{\ell}$ as input. We apply the rotation $R_y(\theta_1)$ when $\ell=0$ and $R_y(\theta_2)$ when $\ell=1$, here $\theta_1 = 2\arccos a$ and $\theta_2 = 2\arccos b$.
+Next, consider the oracle $O_A$, which encodes the values of the nonzero entries. Since the entries $a$ and $b$ in~\eqref{eq:example_matrix} depend only on $\ell$, we can design a simple circuit that takes $\ket{\ell}$ as input and applies appropriate rotations. Specifically, we apply a rotation $R_y(\theta_1)$ when $\ell = 0$ and $R_y(\theta_2)$ when $\ell = 1$, where:
+\begin{equation}
+\theta_1 = 2\arccos(a), \quad \theta_2 = 2\arccos(b).
+\end{equation}
+Combining these two oracles, we obtain the full quantum circuit for the block encoding of matrix $A$. The resulting circuit is illustrated in Figure~\ref{fig:2x2_circuit}, where the control logic and rotation gates together realize an exact block encoding of the $2 \times 2$ symmetric matrix.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics{pdf/2x2_circuit}
-  \caption{
-    Complete block encoding quantum circuits for $2\times2$ matrices
-  }
+  \caption{Quantum circuit implementing the block encoding of a $2\times2$ real symmetric matrix.}
   \label{fig:2x2_circuit}
 \end{figure}
 
-Merge the two oracles, we can get the quantum circuit for the block encoding of $A$ as shown in Fig.~\ref{fig:2x2_circuit}.
+\subsection{Block Encoding of Banded Circulant Matrices}\label{sec:banded_circulant}
 
-\subsection{Block Encoding of banded circulant matrices}
+Circulant matrices form a special class of structured matrices where each row is a cyclic shift of the preceding row. A \emph{banded circulant matrix} further restricts non-zero entries to a fixed bandwidth. Consider the following 2-banded circulant matrix with sparsity $s=3$:
+$$
+A =
+\begin{bmatrix}
+a & b & 0 & \cdots & 0 & c \\
+c & a & b & \cdots & 0 & 0 \\
+0 & c & a & \cdots & 0 & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+0 & 0 & 0 & \cdots & a & b \\
+b & 0 & 0 & \cdots & c & a
+\end{bmatrix}.\label{eq:example_circulant_matrix}
+$$
+For this matrix, the column mapping function $c(j, \ell)$ can be defined as:
+$$
+c(j, \ell) =
+\begin{cases}
+j-1 \ (\text{mod } N), & \ell = 0, \\
+j, & \ell = 1 \text{ or } 3, \\
+j+1 \ (\text{mod } N), & \ell = 2.
+\end{cases}\label{eq:equation13}
+$$
 
-Circulant matrices are a special class of matrices where each row is a cyclic shift of the previous row. While banded circulant matrices are circulant matrices with non-zero entries only within a certain bandwidth. We give a concrete example of a 2-banded circulant matrix with $s=3$:
-\begin{equation}
-  A =
-  \begin{bmatrix}
-    a      & b      & 0      & \cdots & 0      & c      \\
-    c      & a      & b      & \cdots & 0      & 0      \\
-    0      & c      & a      & \cdots & 0      & 0      \\
-    \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
-    0      & 0      & 0      & \cdots & a      & b      \\
-    b      & 0      & 0      & \cdots & c      & a
-  \end{bmatrix}.\label{eq:example_circulant_matrix}
-\end{equation}
-For this matrix, the function $C(j, \ell)$ can be written as
-\begin{equation}
-  c(j, \ell) =
-  \begin{cases}
-    j-1, & \text{if } \ell = 0,\\
-    j, & \text{if } \ell = 1 \text{ or } 3,\\
-    j+1, & \text{if } \ell = 2.
-  \end{cases}\label{eq:equation13}
-\end{equation}
-Here the incides $j-1$, $j$, and $j+1$ are taken modulo $N$. To implement the oracle $O_C$, notice that $j-1$ and $j+1$ are permutation operations which defined as
-\begin{equation}
-  L=
-  \begin{bmatrix}
-    0      & 0      & 0      & \cdots & 0      & 1      \\
-    1      & 0      & 0      & \cdots & 0      & 0      \\
-    0      & 1      & 0      & \cdots & 0      & 0      \\
-    \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
-    0      & 0      & 0      & \cdots & 1      & 0
-  \end{bmatrix}, \quad R=
-  \begin{bmatrix}
-    0      & 1      & 0      & \cdots & 0      & 0      \\
-    0      & 0      & 1      & \cdots & 0      & 0      \\
-    0      & 0      & 0      & \cdots & 0      & 0      \\
-    \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
-    1      & 0      & 0      & \cdots & 0      & 0
-  \end{bmatrix}.\label{eq:equation14}
-\end{equation}
+To implement the oracle $O_C$, observe that $j-1$ and $j+1$ correspond to cyclic permutation operations. These are represented by the left/right shift matrices $L$ and $R$:
+$$
+L =
+\begin{bmatrix}
+0 & 0 & \cdots & 0 & 1 \\
+1 & 0 & \cdots & 0 & 0 \\
+0 & 1 & \cdots & 0 & 0 \\
+\vdots & \vdots & \ddots & \vdots & \vdots \\
+0 & 0 & \cdots & 1 & 0
+\end{bmatrix}, \quad
+R =
+\begin{bmatrix}
+0 & 1 & 0 & \cdots & 0 \\
+0 & 0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 1 \\
+1 & 0 & 0 & \cdots & 0
+\end{bmatrix}.\label{eq:equation14}
+$$
 
 \begin{figure}[htbp]
   \centering
-  \subfigure{
-    \includegraphics{pdf/circulant_l_shift}
-  }
-  \subfigure{
-    \includegraphics{pdf/circulant_r_shift}
-  }
-  \caption{Oracles for $L$ (left) and $R$ (right)}
+  \includegraphics{pdf/circulant_l_shift} \quad
+  \includegraphics{pdf/circulant_r_shift}
+  \caption{Quantum implementation of left-shift $L$ (left) and right-shift $R$ (right) using multi-qubit CNOT gates.}
   \label{fig:circulant_lr}
 \end{figure}
 
-Fig.~\ref{fig:circulant_lr} gives the implementation of $L$ and $R$ with assistance of multi-qubit CNOT gates shown in.
+The quantum circuits for $L$ and $R$ are shown in Figure~\ref{fig:circulant_lr}, which utilize controlled operations to realize cyclic shifts. Two qubits $\ket{\ell_1}$ and $\ket{\ell_2}$ are required to encode $\ell \in \{0,1,2,3\}$ according to Eq.~\eqref{eq:equation13}. The resulting oracle $O_C$ operates independently of $j$, leveraging the structure of $L$ and $R$.
 
-Two qubits $\ket{\ell_1}$ and $\ket{\ell_2}$ are needed to encode the value of $\ell \in \{0,1,2,3\}$ in Eq.~\eqref{eq:equation13}. Using the definition of $c(j, \ell)$, we can construct a $j$ independent oracle $O_C$ that has the following action:
-
-Like $2\times2$ matrices, the matrix elements of $A$ depend on $\ell$. This paper provides a detailed derivation and presents a general quantum circuit for the block encoding of $O_A$ in fig.~\ref{fig:circulant_oa}, where the rotation angles $\theta_0 = 2\arccos (a-1)$, $\theta_1 = 2\arccos b$, and $\theta_2 = 2\arccos c$.
+For the amplitude oracle $O_A$, note that the matrix elements of $A$ depend only on $\ell$. Following the derivation in Section~\ref{sec:instances}, we construct a controlled rotation-based $O_A$ as shown in Figure~\ref{fig:circulant_oa}, with rotation angles:
+$$
+\theta_0 = 2\arccos(a-1), \quad
+\theta_1 = 2\arccos(b), \quad
+\theta_2 = 2\arccos(c).
+$$
 
 \begin{figure}[htbp]
   \centering
@@ -433,29 +434,34 @@ Like $2\times2$ matrices, the matrix elements of $A$ depend on $\ell$. This pape
     \includegraphics{pdf/circulant_oa}
     \label{fig:circulant_oa}
   }
-  \subfigure[Another form of $O_A$]{
+  \subfigure[Alternative $O_A$ implementation]{
     \includegraphics{pdf/circulant_oa2}
     \label{fig:circulant_oa2}
   }
-  \caption{Oracles for circulant matrices}
+  \caption{Oracles for banded circulant matrices. The alternative $O_A$ in (c) uses Walsh-Hadamard transformed phases $\phi_i$ for computational efficiency.}
 \end{figure}
 
-We can prove that the oracle $O_A$ is equivalent to the oracle in fig.~\ref{fig:circulant_oa2} for computer friendly code. Here $\phi_i$ are computed from $\theta_i$ through a Walsh-Hadamard transformation. The complete quantum circuit for the block encoding of $A$ is defined as fig ~\ref{fig:circulant_circuit}.
+Figure~\ref{fig:circulant_oa2} presents an equivalent implementation of $O_A$ using a Walsh-Hadamard transformation to compute phase parameters $\phi_i$ from $\theta_i$. This formulation is particularly advantageous for digital implementations. Combining both oracles yields the complete block encoding circuit in Figure~\ref{fig:circulant_circuit}.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics{pdf/circulant_circuit}
-  \caption{
-    Complete block encoding quantum circuits for circulant matrices
-  }
+  \caption{Quantum circuit for block encoding banded circulant matrices.}
   \label{fig:circulant_circuit}
 \end{figure}
 
-Apparently, the number of Hadamard gates, controlled rotations and controlled $L$ and $R$ gates in the circuit is $\mathcal{O}(\log s)$. $L$ and $R$ are multi-qubit controlled gates, which can be decomposed innto a series of two-qubit controlled gates with the number of $\mathrm{poly}(n)$. Thus, the gate complexity of the circuit is $\mathcal{O}(n)$, and this is efficient enough for theoretical calculate.
+The gate complexity analysis reveals:
+- $\mathcal{O}(\log s)$ Hadamard gates, controlled rotations, and shift operators.
+- Multi-qubit $L$/$R$ gates decompose into $\mathrm{poly}(n)$ two-qubit gates.
+- No need to explicitly implement powers of shift operators (e.g., via repeated circuits), as shown in Lemma~\ref{lem:shift_optimization}.
 
-\subsection{Block Encoding of Extended binary tree}
+Thus, the total gate count scales as $\mathcal{O}(n)$, maintaining efficiency for theoretical analysis and practical implementations.
 
-The two previous examples are relatively simple, because the $c(j, \ell)$ functions are easy to provide and the element value are totally determined by $\ell$. We consider a more complex example: the block encoding of an extended binary tree. The adjacency matrix of an extended binary tree is a sparse matrix with a specific structure, which can be represented as follows:
+\subsection{Block Encoding of an Extended Binary Tree}
+
+The two preceding examples were relatively simple in structure, as the function $c(j, \ell)$ was straightforward to define and the matrix elements were fully determined by $\ell$. We now consider a more intricate example: the block encoding of an extended binary tree.
+
+An extended binary tree can be represented by its adjacency matrix, which exhibits a sparse hierarchical structure. For an 8-node extended binary tree, the corresponding matrix is illustrated below:
 
 \begin{figure}[htbp]
   \centering
@@ -465,7 +471,6 @@ The two previous examples are relatively simple, because the $c(j, \ell)$ functi
         level/.style={sibling distance=40mm/#1},
         every node/.style={circle, draw, minimum size=1em, inner sep=2pt}
       ]
-
       \node {0}
       child {node {1}
         child {node {2}
@@ -477,7 +482,6 @@ The two previous examples are relatively simple, because the $c(j, \ell)$ functi
           child {node {7}}
         }
       };
-
     \end{tikzpicture}
   \end{minipage}
   \hfill
@@ -496,12 +500,14 @@ The two previous examples are relatively simple, because the $c(j, \ell)$ functi
         &       & & \beta  & & &       & \gamma \\
       \end{bmatrix}.
     \end{equation}
-  \end{minipage}\label{fig:figure}
+  \end{minipage}
+  \caption{Graph structure and adjacency matrix of an 8-node extended binary tree.}
+  \label{fig:figure}
 \end{figure}
 
-In this matrix, $\gamma$ is assigned to the root node and leave nodes, while $\alpha$ is assigned to the internal nodes. The edges connecting the nodes are represented by $\beta$.
+In this matrix, $\gamma$ represents the self-loops at the root and leaf nodes, $\alpha$ corresponds to the internal nodes, and $\beta$ encodes the edge weights between connected nodes.
 
-We consider the $\ell$ type of nonzero element instead of $\ell$th nonzero element here. Note for node $i$, we define $2i$ as its left child and $2i+1$ as its right child. The function $c(j, \ell)$ can be defined as
+To construct the block encoding, we define $c(j, \ell)$ based on the tree's hierarchical structure. For a node $i$, its left and right children are indexed as $2i$ and $2i+1$, respectively. The column mapping function becomes:
 \begin{equation}
   c(j, \ell) =
   \begin{cases}
@@ -513,31 +519,42 @@ We consider the $\ell$ type of nonzero element instead of $\ell$th nonzero eleme
   \end{cases}\label{eq:equation17}
 \end{equation}
 
-Multiply or divide by 2 is equivalent to a left or right shift operation. This is easy to implement with swap gates. For example, if we divide $[0j_2j_1j_0]$ by 2,
+Multiplication/division by 2 corresponds to left/right shift operations, which can be implemented via swap gates. For example, dividing $[0j_2j_1j_0]$ by 2 involves:
 \begin{equation}
-  [0j_2j_1j_0] \xrightarrow{\text{swap}(j_0,j_1)} [0j_2j_0j_1] \xrightarrow{\text{swap}(j_0,j_2)} [0j_0j_2j_1] \xrightarrow{\text{swap}(j_0,0)} [j_00j_1j_2].
+  [0j_2j_1j_0] 
+  \xrightarrow{\text{swap}(j_0,j_1)} [0j_2j_0j_1] 
+  \xrightarrow{\text{swap}(j_0,j_2)} [0j_0j_2j_1] 
+  \xrightarrow{\text{swap}(j_0,0)} [j_00j_1j_2].
 \end{equation}
-Measurement on the first qubit may be needed. This gives a oracle between $\ket{0}$ and $\ket{j}$, and we denote it as $M_2$ and $D_2$. Use $L$ and $R$ defined in Eq.~\eqref{eq:equation14}, $O_C$ can be constructed similarly in fig.~\ref{fig:tree_oc}.
+Measurement on the first qubit may be required to ensure correctness. This procedure realizes an oracle mapping $\ket{0}$ to $\ket{j}$, denoted as $M_2$ and $D_2$. Combined with the control logic $L$ and $R$ from Eq.~\eqref{eq:equation14}, $O_C$ can be constructed as shown in Figure~\ref{fig:tree_oc}.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics{pdf/tree_oc}
-  \caption{Oracle $O_C$ for binary tree matrices}
+  \caption{Oracle $O_C$ implementation for binary tree matrices.}
   \label{fig:tree_oc}
 \end{figure}
 
-The construction of the $O_A$ depends on how $O_C$ is constructed. We can still write $O_A$ as a series of controlled rotations: $\theta_0 = 2\arccos \beta$ by $\ell_2 =0$, $\theta_1 = 2\arccos (\alpha/ 4)$ by $(\ell_2, j_2) = (1,0)$, $\theta_2 = 2\arccos (\gamma/ 4)$ by $(\ell_2, j_2) = (1,1)$, and $\theta_3 = 2\arccos (\gamma/ 4 - \beta/2) - \theta_1$ by $(\ell_2, j) = (1,0)$.
+The $O_A$ oracle is constructed by analyzing the sparsity pattern. It can be expressed as a sequence of controlled rotations:
+$$
+\begin{aligned}
+\theta_0 &= 2\arccos(\beta) \quad \text{for } \ell_2 = 0, \\
+\theta_1 &= 2\arccos(\alpha/4) \quad \text{for } (\ell_2, j_2) = (1,0), \\
+\theta_2 &= 2\arccos(\gamma/4) \quad \text{for } (\ell_2, j_2) = (1,1), \\
+\theta_3 &= 2\arccos(\gamma/4 - \beta/2) - \theta_1 \quad \text{for } (\ell_2, j) = (1,0).
+\end{aligned}
+$$
 
-Combining the oracles $O_C$ and $O_A$, we get the complete quantum circuit for the block encoding of the extended binary tree matrix as shown in fig.~\ref{fig:tree_circuit}. This is the circuit for $8\times 8$ matrix, and can be easily extended to larger matrices by adding more qubits.
+By combining $O_C$ and $O_A$, we obtain the complete quantum circuit for the block encoding of the extended binary tree matrix (Figure~\ref{fig:tree_circuit}). This $8 \times 8$ implementation generalizes to larger matrices by adding qubits to the register.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics{pdf/tree_circuit}
-  \caption{Complete circuit for binary tree matrices.}
+  \caption{Complete quantum circuit for block encoding extended binary tree matrices.}
   \label{fig:tree_circuit}
 \end{figure}
 
-Just as discussed in the previous section, the number of each gate in the circuit is $\mathcal{O}(\log s)$, and all gates can be decomposed into $\mathrm{poly}(n)$ two-qubit controlled gates, and still, this algorithm is considered efficient.
+As discussed in Section~\ref{sec:block_encoding}, the gate count scales as $\mathcal{O}(\log s)$, and all operations decompose into $\mathrm{poly}(n)$ two-qubit gates. This demonstrates that the block encoding approach remains efficient even for complex hierarchical structures like extended binary trees.
 
 \section{Efficient Block Encoding of Symmetric Stochastic Matrices without Scaling Factor}\label{sec:efficient-block-encoding-of-symmetric-stochastic-matrices-without-scaling-factor}
 In the previous section, we introduced the general framework for constructing block encodings of $s$-sparse matrices in original paper.
@@ -616,27 +633,33 @@ For a polynomial $p(t)$ satisfying the conditions in Theorem~\ref{thm:qsp}, we c
   \label{thm:qsvt}
 \end{theorem}
 
-\section{Hermitian block encoding}
+\section{Additional Tricks and Extensions on Block Encoding}
 
-The previous section \ref{sec:block_encoding} provides a general framework for constructing block encodings of $s$-sparse matrices, but the encoding unitary $U_A$ does not necessarily preserve the Hermitian property of the matrix $A$. We will show in this section that how to construct a Hermitian block encoding of a sparse Hermitian matrix $A$ using the quantum circuit in theorem~\ref{thm:main_result2}.
+As established in Section~\ref{sec:block_encoding}, block encoding provides a systematic framework for representing sparse matrices in quantum circuits. Section~\ref{sec:instances} demonstrated concrete implementations for specific matrix structures. This section introduces advanced techniques that enhance the applicability of block encoding in both theoretical analysis and practical quantum algorithms.
+
+\subsection{Hermitian Block Encoding}
+
+While the general block encoding framework applies to arbitrary sparse matrices, it does not inherently preserve Hermiticity—a critical property in Hamiltonian simulation and quantum eigenvalue estimation. This subsection addresses this limitation by constructing Hermitian block encodings for sparse Hermitian matrices through Theorem~\ref{thm:main_result2}.
 
 \begin{theorem}
   Suppose $A$ is a sparse Hermitian matrix of dimension $2^n$ with at most $s = 2^m$ non-zeros per column, with $m \leq n$. If a unitary $O_C$ satisfies
   \begin{equation}
-    O_C \ket{\ell} \ket{j} = \ket{c(j, \ell)} \ket{j},
+    O_C \ket{\ell} \ket{j} = \ket{c(j, \ell)} \ket{j},\label{eq:equation18}
   \end{equation}
   where $c(j, \ell)$ is the row index of the $\ell$th non-zero element in the $j$th column, and if there exists a unitary $O_A$ such that
   \begin{equation}
     (I \otimes O_A) \ket{0} \ket{0} \ket{i} \ket{j} = \ket{0} \left( \sqrt{|A_{ij}|} \ket{0} + \sqrt{1 - |A_{ij}|} \ket{1} \right) \ket{i} \ket{j},
   \end{equation}
-  for $A_{ij} = |A_{ij}| e^{i \theta_{ij}}$, where $\theta_{ij} \in [0, 2\pi)$, the square root is uniquely defined as $\sqrt{A_{ij}} = \sqrt{|A_{ij}|} e^{i \theta_{ij}/2}$. Then the unitary $U_A$ represented by the circuit shown in fig. ~\ref{fig:hermitian_encoding} is a Hermitian block encoding of $A$, where $D_s$ is a diffusion operator defined as
+  for $A_{ij} = |A_{ij}| e^{i \theta_{ij}}$, where $\theta_{ij} \in [0, 2\pi)$, the square root is uniquely defined as $\sqrt{A_{ij}} = \sqrt{|A_{ij}|} e^{i \theta_{ij}/2}$. Then the unitary $U_A$ represented by the circuit shown in Fig.~\ref{fig:hermitian_encoding} is a Hermitian block encoding of $A$, where $D_s$ is a diffusion operator defined as
   \begin{equation}
     D_s \equiv I_2 \otimes \cdots \otimes
     \underbrace{H \otimes H \otimes \cdots \otimes H}_{m},
   \end{equation}
-  and SWAP is a swap operator that swaps the last two $n$-qubit registers in fig. ~\ref{fig:hermitian_encoding} respectively.
+  and SWAP is a swap operator that swaps the last two $n$-qubit registers in Fig.~\ref{fig:hermitian_encoding} respectively.
   \label{thm:main_result2}
 \end{theorem}
+
+This construction leverages a key distinction in oracle design compared to Section~\ref{sec:block_encoding}: while Definition~\ref{eq:equation4} encodes $c(j, \ell)$ in the second register with $\ell$ preserved, Eq.~\ref{eq:equation18} maintains the column index $j$ in the second register while mapping $\ket{\ell}$ to $\ket{c(j, \ell)}$. The resulting circuit in Figure~\ref{fig:hermitian_encoding} ensures $U_A = U_A^\dagger$, thereby preserving the Hermitian structure of $A$.
 
 \begin{figure}[htbp]
   \centering
@@ -644,6 +667,76 @@ The previous section \ref{sec:block_encoding} provides a general framework for c
   \caption{Quantum circuit for the Hermitian block encoding of a sparse Hermitian matrix $A$}
   \label{fig:hermitian_encoding}
 \end{figure}
+
+\subsection{Efficient Computation of Shift Matrix Powers}
+
+Section~\ref{sec:banded_circulant} introduced cyclic shift operations for circulant matrices. We now present an optimized method to compute arbitrary powers of these shift operators—a common operation in block encoding algorithms.
+
+For the left-shift matrix $L$ defined in Eq.~\eqref{eq:equation14}, observe the recursive decomposition:
+\begin{equation}
+L_n^2 = L_{n-1} \oplus I_2.\label{eq:equation19}
+\end{equation}
+This identity enables a binary exponentiation approach similar to classical fast exponentiation algorithms. Given a binary-encoded exponent:
+\begin{equation}
+j = [j_{n-1} j_{n-2} \cdots j_1 j_0] = \sum_{i=0}^{n-1} j_i 2^i,
+\end{equation}
+we can decompose the power operation as:
+\begin{equation}
+L_n^j = \prod_{i=0}^{n-1} \left(L_n^{2^i} \right)^{j_i}.
+\end{equation}
+Applying Eq.~\ref{eq:equation19} recursively yields:
+\begin{equation}
+L_n^{2^i} = L_{n-i} \oplus \underbrace{I_2 \oplus \cdots \oplus I_2}_{i}.
+\end{equation}
+This hierarchical structure allows implementation of $L_n^j$ in $\mathcal{O}(n)$ time using controlled unitaries $O_1, O_2, \ldots, O_{n-1}$. Figure~\ref{fig:shift_power} illustrates this construction for $n=3$.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{pdf/shift_power}
+  \caption{Circuit implementing $L_n^j$ for $n=3$}
+  \label{fig:shift_power}
+\end{figure}
+
+\subsection{Quantum Walks and Block Encoded Discriminant Matrices}
+
+We explores the interplay between quantum walks, block encodings, and classical Markov chains, highlighting how block encoding techniques enhance the efficiency of quantum algorithms for graph problems. This subsection summarizes the key theoretical insights and practical implications.
+
+\subsubsection{Properties of Markov Chain Matrices}
+A classical Markov chain is governed by a stochastic matrix $ P $, where $ P_{ij} $ represents the transition probability from state $ i $ to $ j $. The stationary distribution $ \pi $ satisfies $ \pi^\top P = \pi^\top $, and for an ergodic chain (irreducible and aperiodic), $ \pi $ is unique. A reversible Markov chain further satisfies the detailed balance condition $ \pi_i P_{ij} = \pi_j P_{ji} $, enabling the construction of a symmetric discriminant matrix $ D $ with entries:
+\begin{equation}
+D_{ij} = \sqrt{P_{ij} P_{ji}}. \label{eq:discriminant_matrix}
+\end{equation}
+This matrix $ D $ shares eigenvalues with $ P $, and its symmetric structure simplifies spectral analysis. The stationary state $ \ket{\pi} = \sum_i \sqrt{\pi_i} \ket{i} $ becomes the principal eigenvector of $ D $, satisfying $ D \ket{\pi} = \ket{\pi} $.
+
+\subsubsection{Szegedy Quantum Walk as a Block Encoding}
+The Szegedy quantum walk generalizes classical random walks by leveraging block encodings of $ D $. Given a reversible $ P $, the walk operator $ U_Z $ is constructed via two reflection operators $ R_{\Pi_1} $ and $ R_{\Pi_2} $, defined as:
+\begin{equation}
+U_Z = R_{\Pi_2} R_{\Pi_1}, \quad \text{where } R_{\Pi_l} = 2 \sum_j \ket{\psi_l^j}\bra{\psi_l^j} - I.
+\end{equation}
+Here, $ \ket{\psi_1^j} $ and $ \ket{\psi_2^j} $ are quantum states encoding rows/columns of $ \sqrt{P} $. Crucially, $ U_Z $ corresponds to a block encoding of $ T_2(D) $, where $ T_k $ denotes the Chebyshev polynomial of degree $ k $. More generally, $ k $-step Szegedy walks implement $ T_{2k}(D) $, enabling polynomial transformations of $ D $'s spectrum.
+
+\subsubsection{Quantum Speedup in Detecting Marked Vertices}
+The section demonstrates a quadratic speedup in detecting a marked vertex in a graph using quantum walks. Consider a complete graph $ G $ with $ N $ vertices:
+
+For classical setting, a random walk with transition matrix $ P $ requires $ \mathcal{O}(N) $ steps to identify a marked vertex due to the spectral gap $ \delta = \mathcal{O}(1/N) $; For quantum setting, by block encoding $ D $ and applying $ U_Z^k $, the success probability of measuring $ \ket{0^n} $ drops to $ \mathcal{O}(1/N) $ after $ k = \mathcal{O}(\sqrt{N}) $ steps. This follows from the Chebyshev polynomial amplification:
+\begin{equation}
+T_k(1 - \delta) \approx \cos\left(k \sqrt{2\delta}\right), \quad \text{yielding } p(\ket{0^n}) = \frac{1}{N} + \left(1 - \frac{1}{N}\right) T_k^2(1 - \delta).
+\end{equation}
+When $ k \propto \sqrt{N} $, the interference effect sharply distinguishes the marked state, achieving a quadratic speedup over classical methods.
+
+\subsubsection{Implications and Experimental Validation}
+
+This analysis underscores some key advantages of block encoding in quantum walks:
+
+\begin{enumerate}
+  \item Spectral Amplification: Chebyshev polynomials $ T_k(D) $ amplify eigenvalue separations, accelerating convergence to stationary states.
+  \item Efficient Implementation: Block encoding allows direct manipulation of $ D $ without explicit matrix exponentiation, enabling efficient quantum circuits for large graphs.
+  \item Quadratic Speedup: The quantum walk framework achieves a quadratic speedup in detecting marked vertices, surpassing classical random walks.
+\end{enumerate}
+
+In experiment, for $ n = 6 $ qubits, block-encoded discriminant matrices for both marked and unmarked graphs are constructed. Repeated application of the quantum walk operator confirms that the success probability collapses at $ k \propto \sqrt{N} $, aligning with theoretical predictions.
+
+These results position block encoding as a foundational tool for translating classical probabilistic algorithms into quantum-accelerated counterparts, particularly in graph theory and search problems.
 
 \bibliographystyle{unsrt}
 \bibliography{references}
