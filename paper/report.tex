@@ -1,7 +1,6 @@
 \documentclass{article}
 
 \usepackage[final]{neurips_2022}
-%\usepackage[UTF8]{ctex}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -843,7 +842,7 @@
     
     This report reviewed and extended the framework for constructing explicit quantum circuits for block encodings of sparse matrices, as proposed by Camps et al. By decomposing the unitary into sparsity-pattern and value-encoding oracles ($O_C$ and $O_A$), the work bridges theoretical block-encoding strategies with hardware-realizable implementations. Key contributions include efficient $\mathrm{poly}(n)$-gate circuits for structured matrices like circulant and extended binary tree graphs, enabling scalable quantum linear algebra operations. The extension to Hermitian block encodings and symmetric stochastic matrices further broadens applicability to quantum walks and spectral analysis, achieving quadratic speedups in marked-vertex detection.
     
-    Our numerical demonstrations and Python implementations validate the practicality of the approach, while open challenges, such as optimizing gate counts for broader matrix classes and integrating noise-resilient designs, highlight promising directions for future research. How to apply the algorithm and design the proper $O_A$ and $O_C$ is the core difficulty. This work underscores block encoding as a foundational tool for advancing quantum algorithms in machine learning, differential equations, and graph theory.
+    Our numerical demonstrations and Python implementations validate the practicality of the approach. We have tested all block encoding through \texttt{get\_unitary} function and the results are proved correct. However, open challenges, such as optimizing gate counts for broader matrix classes and integrating noise-resilient designs, highlight promising directions for future research. How to apply the algorithm and design the proper $O_A$ and $O_C$ is the core difficulty. This work underscores block encoding as a foundational tool for advancing quantum algorithms in machine learning, differential equations, and graph theory.
 
     \bibliographystyle{unsrt}
     \bibliography{references}
