@@ -702,13 +702,13 @@
         K\ket{0^n} = (\sqrt{\alpha}\sqrt{\beta}0\ldots0\sqrt{\gamma})^T\label{eq:equation27}
     \end{equation}
     We analyze the circuit for $ K $ by examining the action of $ K^\dagger $ in reverse. The inverse procedure starts with a sequence of multi-control X gates that relocate the non-zero element from the $ (N-1) $-th (last) row to row 3. Applying the rotation $ R_y(\theta_2) $ with
-    $$
+    \begin{equation}
     \theta_2 = -\arctan\left( \sqrt{\frac{\gamma}{\beta}} \right)
-    $$
+    \end{equation}
     to rows 1 and 3 of the intermediate state zeros out $ \sqrt{\gamma} $ in row 3. Finally, the rotation $ R_y(\theta_1) $, defined as
-    $$
+    \begin{equation}
     \theta_1 = -\arctan\left( \sqrt{\frac{\beta+\gamma}{\alpha}} \right),
-    $$
+    \end{equation}
     cancels the amplitude $ \sqrt{\beta+\gamma} $ in row 1 against $ \sqrt{\alpha} $ in row 0. The circuit for $ K $ is constructed by reversing the order of these operations and flipping the signs of the rotation angles, as demonstrated in Fig.~\ref{fig:K_circuit}.
 
     \begin{figure}[htbp]
@@ -720,7 +720,7 @@
         \label{fig:K_circuit}
     \end{figure}
 
-    In the second phase, we leverage the identity $ Pe_j = L_n^{j-1} Pe_0 $, where $ e_j $ is the $ j $-th column of the identity matrix, to construct a controlled-$ L $ shift adder circuit mapping $ |Pe_0\rangle |j\rangle $ to $ |Pe_j\rangle |j\rangle $. The implementation of this controlled-$ L $ shift operation is rigorously derived in the supplementary materials. Combining both stages alongside the SWAP operator yields the quantum circuit representation for the Hermitian block encoding of $ P $, as visualized in Fig.~\ref{fig:direct_circuit}
+    In the second phase, we leverage the identity $ Pe_j = L_n^{j-1} Pe_0 $, where $ e_j $ is the $ j $-th column of the identity matrix, to construct a controlled-$ L $ shift adder circuit mapping $ \ket{Pe_0} \ket{j} $ to $ \ket{Pe_j} \ket{j}$. The implementation of this controlled-$ L $ shift operation is rigorously derived in the supplementary materials. Combining both stages alongside the SWAP operator yields the quantum circuit representation for the Hermitian block encoding of $ P $, as visualized in Fig.~\ref{fig:direct_circuit}
 
     \begin{figure}[htbp]
         \centering
@@ -838,6 +838,12 @@
     In experiment, for $ n = 6 $ qubits, block-encoded discriminant matrices for both marked and unmarked graphs are constructed. Repeated application of the quantum walk operator confirms that the success probability collapses at $ k \propto \sqrt{N} $, aligning with theoretical predictions.
 
     These results position block encoding as a foundational tool for translating classical probabilistic algorithms into quantum-accelerated counterparts, particularly in graph theory and search problems.
+
+    \section{Conclusion and Future Directions}
+    
+    This report reviewed and extended the framework for constructing explicit quantum circuits for block encodings of sparse matrices, as proposed by Camps et al. By decomposing the unitary into sparsity-pattern and value-encoding oracles ($O_C$ and $O_A$), the work bridges theoretical block-encoding strategies with hardware-realizable implementations. Key contributions include efficient $\mathrm{poly}(n)$-gate circuits for structured matrices like circulant and extended binary tree graphs, enabling scalable quantum linear algebra operations. The extension to Hermitian block encodings and symmetric stochastic matrices further broadens applicability to quantum walks and spectral analysis, achieving quadratic speedups in marked-vertex detection.
+    
+    Our numerical demonstrations and Python implementations validate the practicality of the approach, while open challenges such as optimizing gate counts for broader matrix classes and integrating noise-resilient designs—highlight promising directions for future research. This work underscores block encoding as a foundational tool for advancing quantum algorithms in machine learning, differential equations, and graph theory.
 
     \bibliographystyle{unsrt}
     \bibliography{references}

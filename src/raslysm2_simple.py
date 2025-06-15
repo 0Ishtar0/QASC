@@ -28,27 +28,6 @@ def realsym2_simple(alpha1, alpha2, shots=10000, draw=False):
     qc.cx(1, 0)
     qc.h(1)
 
-    # # === 测量 ===
-    # qc.measure(0, 0)
-    # qc.measure(1, 1)
-    # if draw:
-    #     qc.draw('latex_source', filename=f'{realsym2_simple.__name__}.tex')
-    #
-    # # === 执行模拟器，检查“成功率” ===
-    # backend = Aer.get_backend("qasm_simulator")
-    # transpiled_circuit = transpile(qc, backend)
-    # job = backend.run(transpiled_circuit, shots=shots)
-    # counts = job.result().get_counts()
-    # # === 输出测量结果 ===
-    # print("Measurement result (on ancilla qubit):")
-    # print(counts)
-    #
-    # if draw:
-    #     from qiskit.visualization import plot_histogram
-    #     plot_histogram(counts)
-    #     plt.show()
-
-    # 得到量子线路对应的酉矩阵
     backend = Aer.get_backend('unitary_simulator')
     transpiled = transpile(qc, backend)
     job = backend.run(transpiled)
