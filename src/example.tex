@@ -1,0 +1,17 @@
+\documentclass[border=2px]{standalone}
+
+\usepackage[braket, qm]{qcircuit}
+\usepackage{graphicx}
+
+\begin{document}
+    \scalebox{1.0}{
+        \Qcircuit @C=1.0em @R=0.2em @!R { \\
+        \nghost{{q}_{0} :  } & \lstick{\ket{0} :  } & \multigate{2}{\mathrm{K}}_<<<{0} & \multigate{2}{\mathrm{L}}_<<<{0} & \multigate{1}{\mathrm{L}}_<<<{0} & \qw & \targ & \qw & \qswap & \targ & \multigate{1}{\mathrm{R}}_<<<{0} & \multigate{2}{\mathrm{R}}_<<<{0} & \multigate{2}{\mathrm{K^\dagger}}_<<<{0} & \meter & \qw & \qw & \qw & \qw\\
+        \nghost{{q}_{1} :  } & \lstick{\ket{0} :  } & \ghost{\mathrm{K}}_<<<{1} & \ghost{\mathrm{L}}_<<<{1} & \ghost{\mathrm{L}}_<<<{1} & \qw & \qw & \qswap & \qw & \qw & \ghost{\mathrm{R}}_<<<{1} & \ghost{\mathrm{R}}_<<<{1} & \ghost{\mathrm{K^\dagger}}_<<<{1} & \qw & \meter & \qw & \qw & \qw\\
+        \nghost{{q}_{2} :  } & \lstick{\ket{0} :  } & \ghost{\mathrm{K}}_<<<{2} & \ghost{\mathrm{L}}_<<<{2} & \qw & \qswap & \qw & \qw & \qw & \qw & \qw & \ghost{\mathrm{R}}_<<<{2} & \ghost{\mathrm{K^\dagger}}_<<<{2} & \qw & \qw & \meter & \qw & \qw\\
+        \nghost{{q}_{3} :  } & \lstick{\ket{j_0} :  } & \qw & \qw & \qw & \qw & \ctrl{-3} & \qw & \qswap \qwx[-3] & \ctrl{-3} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+        \nghost{{q}_{4} :  } & \lstick{\ket{j_1} :  } & \qw & \qw & \ctrl{-3} & \qw & \qw & \qswap \qwx[-3] & \qw & \qw & \ctrl{-3} & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+        \nghost{{q}_{5} :  } & \lstick{\ket{j_2} :  } & \qw & \ctrl{-3} & \qw & \qswap \qwx[-3] & \qw & \qw & \qw & \qw & \qw & \ctrl{-3} & \qw & \qw & \qw & \qw & \qw & \qw\\
+        \nghost{\mathrm{{c} :  }} & \lstick{\mathrm{{c} :  }} & \lstick{/_{_{3}}} \cw & \cw & \cw & \cw & \cw & \cw & \cw & \cw & \cw & \cw & \cw & \dstick{_{_{\hspace{0.0em}0}}} \cw \ar @{<=} [-6,0] & \dstick{_{_{\hspace{0.0em}1}}} \cw \ar @{<=} [-5,0] & \dstick{_{_{\hspace{0.0em}2}}} \cw \ar @{<=} [-4,0] & \cw & \cw\\
+        \\ }}
+\end{document}
